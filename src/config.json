@@ -1,0 +1,7 @@
+{
+"checking_period": 10,
+"Test_Servers": [
+    {"url": "http://123gadha.com/",    "content_requirement": "simple" }
+    
+]
+}

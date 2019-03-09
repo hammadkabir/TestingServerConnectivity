@@ -1,0 +1,6 @@
+2019-03-09 16:52:14,009   INFO       Checked URL='https://www.york.ac.uk/teaching/cws/wws/webpage1.html' 	 response-time=199.68 ms 	 content_requirement='simple', 	 status='content requirement met'
+2019-03-09 16:52:14,267   INFO       Checked URL='http://www.savolahti.fi' 	 response-time=257.78 ms 	 content_requirement='Here we go again', 	 status='Required Content Not found'
+2019-03-09 16:52:14,270   INFO       Checked URL='http://123gadha.com/' 	 response-time=2.90 ms 	 content_requirement='simple', 	 status=Error connecting the server
+2019-03-09 16:52:14,464   INFO       Checked URL='http://www.savolahti.fi/myWish' 	 response-time=194.11 ms 	 content_requirement='I wish', 	 status=Client's Request specific error
+2019-03-09 16:52:14,652   INFO       Checked URL='http://www.savolahti.fi/myWish' 	 response-time=187.40 ms 	 content_requirement='Not found', 	 status=Client's Request specific error
+2019-03-09 16:52:14,669   INFO       Checked URL='http://151.101.193.69/' 	 response-time=16.76 ms 	 content_requirement='404', 	 status=Server specific error
