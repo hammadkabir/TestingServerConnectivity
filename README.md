@@ -1,4 +1,4 @@
-# New Document# TestingServerConnectivity
+# TestingServerConnectivity
 An Application for periodically checking connectivity/content of Web Servers
 
 # Instructions
