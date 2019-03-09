@@ -16,12 +16,9 @@ TBD:
 
 Look at online WebCrawler codes in Python. 
 Document:
+    Programmed in python3
     The need to install 'requests' library
     
-Now:
-    - Periodicity
-    - Writes a log that contains the progress of the periodic checks.
-
 Write Unit tests.
 Write test cases:
     Servers whose domain name doesn't exist
@@ -67,11 +64,30 @@ class ServerStatusTest:
         """ Reading the configuration file """
         c = json.load(open(self.config_file))
         if "checking_period" in c:
-            self.checking_period = c["checking_period"]
+            self.checking_period = float(c["checking_period"])
         if "Test_Servers" in c:
             self.test_servers    = c["Test_Servers"]
     
     def run_app(self):
+        while True:
+            start_time = time.time()
+            for srv in self.test_servers:
+                url, content_req = srv["url"], srv["content_requirement"]
+                resp = self.process_request(url, content_req)
+                #time.sleep(0.1)
+                
+            time_lapsed = time.time() - start_time
+            sleep_time = self.checking_period - time_lapsed
+            
+            if sleep_time < 0:
+                sleep_time = random.randint(0, 30)
+                self._logger.info("checking period < URL processing period ... Randomly choosing a sleep time of '{}' sec".format(sleep_time))
+                
+            time.sleep(sleep_time)
+            self._logger.info("Next cycle of execution\n\n")
+
+            
+    def run_app_old(self):
         for srv in self.test_servers:
             url, content_req = srv["url"], srv["content_requirement"]
             resp = self.process_request(url, content_req)
