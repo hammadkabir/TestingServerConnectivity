@@ -5,7 +5,6 @@ Shall be scalable to large number of URLs.
 Even for simultaneous queries.
 
 ------------
-Push the code on GitHub as you work with it.
 Signal handler to handle interrupt is needed.
 Commented code, important lines and Function definitions.
 
@@ -30,6 +29,7 @@ Write test cases:
     Test HTTP and HTTPS separately
 
 Move timing of HTTP request against the requests.get() 
+Perhaps a more user-friendly configuration file possible via YAML language.
 
 Test URLS:
     {"url": "https://www.york.ac.uk/teaching/cws/wws/webpage1.html",         "content_requirement": "simple" },   - Content successfully match
@@ -124,8 +124,13 @@ class ServerStatusTest:
 
 if __name__=="__main__":
     try:
+        if len(sys.argv) != 2:
+            print("Run program using     'python3 main.py config.json' ")
+            sys.exit(1)
+        
+        print("Starting the App")
+        config_file = sys.argv[1]
         setup_logging()
-        config_file = "config2.json"                     # TBD: provide as input parameter
         main_log = logging.getLogger("Main")
         s = ServerStatusTest(config_file)
     except KeyboardInterrupt:
