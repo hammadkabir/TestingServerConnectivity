@@ -1,15 +1,9 @@
 """
-Write test codes.            [Particularly test for failures]
-Implement modular code.
 Shall be scalable to large number of URLs.
-Even for simultaneous queries.
+    Even for simultaneous queries.
 
 ------------
-Signal handler to handle interrupt is needed.
 Commented code, important lines and Function definitions.
-
-Run instructions:
-    Run as a shell script, with least effort needed from the user.
 
 TBD:
     Signal Handler support, such that you perform cleanup actions.
@@ -20,6 +14,10 @@ Document:
     The need to install 'requests' library
     
 Write Unit tests.
+    Test for failures
+
+Maa g say baat
+    
 Write test cases:
     Servers whose domain name doesn't exist
     Servers that refuse connection,    
@@ -28,7 +26,7 @@ Write test cases:
 Move timing of HTTP request against the requests.get() 
 Perhaps a more user-friendly configuration file possible via YAML language.
 
-Test URLS:
+Test URLs:
     {"url": "https://www.york.ac.uk/teaching/cws/wws/webpage1.html",         "content_requirement": "simple" },   - Content successfully match
     {"url": "https://www.savolahti.com",    "content_requirement": "Here we go again" },                          - Website found but content does not matche
     {"url": "http://123gadha.com/",    "content_requirement": "simple" }                                          - Website can't be reached.  
@@ -50,7 +48,7 @@ import requests
 
 def setup_logging(filename='ServerTest.log', log_level=logging.INFO):
     logging.basicConfig(filename=filename,  level=log_level, \
-                        format='%(asctime)s   %(levelname)-8s   %(message)s',
+                        format='%(asctime)s   %(name)s   %(levelname)-8s   %(message)s',
                         filemode='w')
 
 class ServerStatusTest:
@@ -62,37 +60,47 @@ class ServerStatusTest:
     
     def read_config(self):
         """ Reading the configuration file """
-        c = json.load(open(self.config_file))
+        c = json.load(open(self.config_file))                       # Can be read periodically as well
         if "checking_period" in c:
             self.checking_period = float(c["checking_period"])
         if "Test_Servers" in c:
             self.test_servers    = c["Test_Servers"]
     
     def run_app(self):
+        """ Main function that periodically executes the loop"""
         while True:
-            start_time = time.time()
-            for srv in self.test_servers:
-                url, content_req = srv["url"], srv["content_requirement"]
-                resp = self.process_request(url, content_req)
-                #time.sleep(0.1)
-                
-            time_lapsed = time.time() - start_time
-            sleep_time = self.checking_period - time_lapsed
-            
-            if sleep_time < 0:
-                sleep_time = random.randint(0, 30)
-                self._logger.info("checking period < URL processing period ... Randomly choosing a sleep time of '{}' sec".format(sleep_time))
-                
-            time.sleep(sleep_time)
+            start_time = self._now()
+            self.run_checks()
+            time_lapsed = self._now() - start_time
+            self.schedule_next_cycle(time_lapsed)
             self._logger.info("Next cycle of execution\n\n")
 
+    def schedule_next_cycle(self, time_lapsed):
+        """ Schedules periodic checks to webservers - by putting the code execution to sleep """
+        sleep_time = self._evaluate_sleep_period(time_lapsed)
+        time.sleep(sleep_time)
+    
+    def _evaluate_sleep_period(self, time_lapsed):
+        """ Returns the sleep time, until next execution cycle """
+        sleep_time = self.checking_period - time_lapsed
+        
+        if sleep_time < 0:
+            sleep_time = random.randint(5, 20)
+            self._logger.info("checking period > URL processing period ... Randomly choosing a sleep time of '{}' sec".format(sleep_time))
             
-    def run_app_old(self):
+        return sleep_time
+    
+    def _now(self):
+        """ Returns current time """
+        return time.time()
+
+    def run_checks(self):
+        """ Goes over the list of URLs and corresponding content requirement """
         for srv in self.test_servers:
             url, content_req = srv["url"], srv["content_requirement"]
             resp = self.process_request(url, content_req)
-            #time.sleep(0.1)
-    
+
+            
     def process_request(self, url, content_req, timeout=1.0):       # possible to give a timeout as configuration parameter
         failure_reason = None
         start_time = time.time()
@@ -110,11 +118,12 @@ class ServerStatusTest:
             self._logger.info("Checked URL='{}' \t response-time={:.2f} ms \t content_requirement='{}', \t status={}".format(url, time_ms, content_req, failure_reason))
             return
         
-        found = resp.text.find(content_req)                         # Can additionally count the number of times the "required content" appeared.
-        if found==-1:
+        found = self.find_content(resp.text, content_req)
+        if found:
             self._logger.info("Checked URL='{}' \t response-time={:.2f} ms \t content_requirement='{}', \t status='{}'".format(url, time_ms, content_req, "Required Content Not found"))
         else:
             self._logger.info("Checked URL='{}' \t response-time={:.2f} ms \t content_requirement='{}', \t status='{}'".format(url, time_ms, content_req, "Content requirement met"))
+            
 
     def do_get(self, url, timeout=None):
         try:
@@ -123,6 +132,14 @@ class ServerStatusTest:
         except Exception as ex:
             #self._logger.warning("Exception in HTTP GET towards url=<{}>".format(ex))
             return None
+    
+    def find_content(self, txt, content_req):
+        """ Returns True or False, depending on if the content is found """
+        found = txt.find(content_req)                          # Might additionally return the count of "required content" in text.
+        if found == -1:
+            return False
+        else:
+            return True
     
     def analyze_response(self, resp):
         """ 
@@ -150,7 +167,7 @@ if __name__=="__main__":
         main_log = logging.getLogger("Main")
         s = ServerStatusTest(config_file)
     except KeyboardInterrupt:
-        main_log.warning("\nKeyboard interrupt")
+        print("\nKeyboard interrupt")
     except Exception as ex:
         #print("Exception << {} >>'".format(ex))
         main_log.error("\nException found .. Printing Traceback \n")
