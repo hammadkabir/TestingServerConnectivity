@@ -1,7 +1,11 @@
 {
 "checking_period": 10,
 "Test_Servers": [
-    {"url": "http://123gadha.com/",    "content_requirement": "simple" }
-    
+    {"url": "https://www.york.ac.uk/teaching/cws/wws/webpage1.html",         "content_requirement": "simple" },
+    {"url": "http://www.savolahti.fi",    "content_requirement": "Here we go again" },
+    {"url": "http://123gadha.com/",    "content_requirement": "simple" },
+    {"url": "http://www.savolahti.fi/myWish",    "content_requirement": "I wish" },
+    {"url": "http://www.savolahti.fi/myWish",    "content_requirement": "Not found" },
+    {"url": "http://151.101.193.69/",    "content_requirement": "404" }
 ]
 }

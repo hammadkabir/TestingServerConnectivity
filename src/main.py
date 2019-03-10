@@ -16,8 +16,6 @@ Document:
 Write Unit tests.
     Test for failures
 
-Maa g say baat
-    
 Write test cases:
     Servers whose domain name doesn't exist
     Servers that refuse connection,    
@@ -70,7 +68,7 @@ class ServerStatusTest:
         """ Main function that periodically executes the loop"""
         while True:
             start_time = self._now()
-            self.run_checks()
+            self._run()
             time_lapsed = self._now() - start_time
             self.schedule_next_cycle(time_lapsed)
             self._logger.info("Next cycle of execution\n\n")
@@ -94,11 +92,11 @@ class ServerStatusTest:
         """ Returns current time """
         return time.time()
 
-    def run_checks(self):
-        """ Goes over the list of URLs and corresponding content requirement """
+    def _run(self):
+        """ Goes over the list of URLs and searches corresponding content requirement """
         for srv in self.test_servers:
             url, content_req = srv["url"], srv["content_requirement"]
-            resp = self.process_request(url, content_req)
+            self.process_request(url, content_req)
 
             
     def process_request(self, url, content_req, timeout=1.0):       # possible to give a timeout as configuration parameter
@@ -126,6 +124,7 @@ class ServerStatusTest:
             
 
     def do_get(self, url, timeout=None):
+        """ Performs actual GET request to web servers """
         try:
             resp = requests.get(url, timeout=timeout)
             return resp
