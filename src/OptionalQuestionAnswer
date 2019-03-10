@@ -1,0 +1,11 @@
+Terminology assumption:
+	MainApplication   - The main application to which the child applications report results.
+	URLTestingApp     - The python script downloading the URLs and checking content requirement.
+
+For distributed deployment and security purposes:
+	To transfer data over the Internet, the MainApplication would open a listening socket to which the URLTestingApp would establish connection. For the sake of security, the connection will be over TLS layer. This results in an encrypted connection, where the exchanged information is secure end to end. To establish TLS connection, each application (MainApplication and URLTestingApp) will be configured with a Private and Public-key pair. The certificate authority (CA) signing the each application's certificate should be trusted by both the MainApplication and individual URLTestingApp.
+
+In terms of coding,
+	It could be possible to send the list of URLs and content_requirements as part of any application-layer protocol customized for the functionality. Upon TLS connection success, when a connected socket is returned to MainApplication, it send a list of URLs and their corresponding content requirement to the connected URLTestingApp. The URLTestingApp will then execute its coded functionality. Upon each cycle of testing the URLs list, it will  transfer the result over TLS connection to the MainApplication program.
+
+	The MainApplication will then extract the App's Geographical Location Identifier from its database, and append App's ID it to each result before storing it in the log file.
