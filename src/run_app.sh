@@ -1,1 +1,1 @@
-python3 main.py config.json
+python3 srv_app.py config.json

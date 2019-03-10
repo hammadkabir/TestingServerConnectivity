@@ -54,7 +54,6 @@ class ServerStatusTest:
         self.config_file    = config_file
         self._logger        = logging.getLogger(name)
         self.read_config()
-        self.run_app()
     
     def read_config(self):
         """ Reading the configuration file """
@@ -122,6 +121,8 @@ class ServerStatusTest:
         else:
             self._logger.info("Checked URL='{}' \t response-time={:.2f} ms \t content_requirement='{}', \t status='{}'".format(url, time_ms, content_req, "Content requirement met"))
             
+    def log_response(self):
+        pass
 
     def do_get(self, url, timeout=None):
         """ Performs actual GET request to web servers """
@@ -165,6 +166,7 @@ if __name__=="__main__":
         setup_logging()
         main_log = logging.getLogger("Main")
         s = ServerStatusTest(config_file)
+        s.run_app()
     except KeyboardInterrupt:
         print("\nKeyboard interrupt")
     except Exception as ex:
