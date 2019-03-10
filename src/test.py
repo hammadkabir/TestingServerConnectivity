@@ -31,19 +31,24 @@ class TestCode(unittest.TestCase):
         resp = self.srv.do_get(url, timeout=2)
         self.assertEqual(type(resp), type(requests.models.Response()), msg="test_valid_url() failed")
 
-    def test_find_content(self):
+    def test_find_content_success(self):
         txt = "let's test servers"
         content_req = "server"
         res = self.srv.find_content(txt, content_req)
         self.assertEqual(res, True, msg="test_find_content() failed")
     
+    def test_find_content_failure(self):
+        txt = "let's test servers"
+        content_req = "server22"
+        res = self.srv.find_content(txt, content_req)
+        self.assertEqual(res, False, msg="test_find_content() failed")
+    
     """
+    def tearDown(self):
+        self.srv.config_file.close()
+        
     def test_split(self):
-        s = 'hello world'
-        self.assertEqual(s.split(), ['hello', 'world'])
-        # check that s.split fails when the separator is not a string
-        with self.assertRaises(TypeError):
-            s.split(2)
+        self.assertRaises(TypeError)
     """
 
 if __name__ == '__main__':

@@ -1,27 +1,16 @@
 """
-Shall be scalable to large number of URLs.
-    Even for simultaneous queries.
-
-------------
-Commented code, important lines and Function definitions.
-
 TBD:
     Signal Handler support, such that you perform cleanup actions.
+    Simultaneous processing of HTTP queries - scalable to many requests.
+    Strict enforcement of configuration file parameters.
+    Moving of time() strictly around requests.get() 
+    Displaying exact error message against each HTTP status code. 
+    More test cases
 
-Look at online WebCrawler codes in Python. 
 Document:
     Programmed in python3
     The need to install 'requests' library
-    
-Write Unit tests.
-    Test for failures
 
-Write test cases:
-    Servers whose domain name doesn't exist
-    Servers that refuse connection,    
-    Test HTTP and HTTPS separately
-
-Move timing of HTTP request against the requests.get() 
 Perhaps a more user-friendly configuration file possible via YAML language.
 
 Test URLs:
@@ -41,7 +30,6 @@ import logging
 import traceback
 import sys
 import requests
-
 
 
 def setup_logging(filename='ServerTest.log', log_level=logging.INFO):
@@ -65,12 +53,15 @@ class ServerStatusTest:
     
     def run_app(self):
         """ Main function that periodically executes the loop"""
+        i = 1
         while True:
+            print("Round#{} of testing URLs".format(i))
             start_time = self._now()
             self._run()
             time_lapsed = self._now() - start_time
             self.schedule_next_cycle(time_lapsed)
-            self._logger.info("Next cycle of execution\n\n")
+            self._logger.info("Round#{} of testing URLs".format(i+1))
+            i += 1
 
     def schedule_next_cycle(self, time_lapsed):
         """ Schedules periodic checks to webservers - by putting the code execution to sleep """
@@ -104,13 +95,16 @@ class ServerStatusTest:
         resp = self.do_get(url, timeout=timeout)
         time_lapsed = time.time() - start_time                      # time calculation should be around --- requests.get(url, timeout=timeout)
         time_ms     = time_lapsed * 1000                            # time in milliseconds
-        
+        self._analyze_response(url, time_ms, resp, content_req)
+    
+    def _analyze_response(self, url, time_ms, resp, content_req):
+        """ Evaluates the response and Records it to Log file """
         if resp is None:
-            self._logger.info("Checked URL='{}' \t response-time={:.2f} ms \t content_requirement='{}', \t status={}".format(url, time_ms, content_req, "Error connecting the server"))
+            self._logger.info("Checked URL='{}' \t response-time={:.2f} ms \t content_requirement='{}', \t status={}".format(url, time_ms, content_req, "Server down (or Unreachable)"))
             return
 
         #print("Response status: ", resp.status_code)
-        failure_reason = self.analyze_response(resp)
+        failure_reason = self.analyze_status_codes(resp)
         if failure_reason is not None:
             self._logger.info("Checked URL='{}' \t response-time={:.2f} ms \t content_requirement='{}', \t status={}".format(url, time_ms, content_req, failure_reason))
             return
@@ -120,9 +114,7 @@ class ServerStatusTest:
             self._logger.info("Checked URL='{}' \t response-time={:.2f} ms \t content_requirement='{}', \t status='{}'".format(url, time_ms, content_req, "Required Content Not found"))
         else:
             self._logger.info("Checked URL='{}' \t response-time={:.2f} ms \t content_requirement='{}', \t status='{}'".format(url, time_ms, content_req, "Content requirement met"))
-            
-    def log_response(self):
-        pass
+
 
     def do_get(self, url, timeout=None):
         """ Performs actual GET request to web servers """
@@ -141,14 +133,14 @@ class ServerStatusTest:
         else:
             return True
     
-    def analyze_response(self, resp):
+    def analyze_status_codes(self, resp):
         """ 
         Based on HTTP status code 4xx or 5xx determines if the error is related to client's HTTP request, or Web server's (internal) problem etc.
         Note: Another possible approach could be to search for the content_requirement on the HTML error page returned (alongwith the status codes).
         """
         reason = None
         if 400<= resp.status_code <500:
-            reason = "Client's Request specific error"
+            reason = "Client's Request error (i.e. NotFound/Forbidden/BadRequest etc.)"
         elif 500<= resp.status_code <600:
             reason = "Server specific error"
 
