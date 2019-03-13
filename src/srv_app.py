@@ -164,7 +164,7 @@ if __name__=="__main__":
     except Exception as ex:
         #print("Exception << {} >>'".format(ex))
         main_log.error("\nException found .. Printing Traceback \n")
-        traceback.print_exc(file=sys.stdout)
+        #traceback.print_exc(file=sys.stdout)
         print()
     finally:
         print("Closing App .. Bye!!")
