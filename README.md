@@ -1,5 +1,5 @@
-# TestingServerConnectivity
-An Application for periodically checking connectivity/content of Web Servers
+# WebMonitor
+An Python application aimed to read a list of URLs from configuration file, and report connectivity status of the webservers.
 
 # Instructions
 python3 main.py config.json
